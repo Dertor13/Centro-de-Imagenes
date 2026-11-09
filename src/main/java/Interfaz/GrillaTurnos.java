@@ -15,6 +15,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.text.MaskFormatter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 public class GrillaTurnos extends JFrame {
 
@@ -25,7 +29,8 @@ public class GrillaTurnos extends JFrame {
     private DefaultTableModel modeloTabla;
     private JButton btnNuevoTurno;
     private JButton btnModificarTurno;
-    private JButton btnEliminarTurno; // Nuevo botón
+    private JButton btnEliminarTurno; 
+    private JButton btnExportarTxt; 
     
     public GrillaTurnos() {
         setTitle("Grilla de Turnos");
@@ -89,7 +94,8 @@ public class GrillaTurnos extends JFrame {
         btnNuevoTurno = new JButton("Asignar / Gestionar Turno");
         btnModificarTurno = new JButton("Ver / Modificar Seleccionado");
         btnEliminarTurno = new JButton("Eliminar Turno"); // Inicialización del nuevo botón
-
+        btnExportarTxt = new JButton("Exportar a TXT");
+        panelBotones.add(btnExportarTxt);
         panelBotones.add(btnNuevoTurno);
         panelBotones.add(btnModificarTurno);
         panelBotones.add(btnEliminarTurno);
@@ -98,6 +104,7 @@ public class GrillaTurnos extends JFrame {
         // Configuración inicial y eventos
         cargarEspecialidades();
         configurarEventos();
+        btnExportarTxt.addActionListener(e -> exportarTurnosATxt());
         cargarTurnosTabla();
     }
 
@@ -215,5 +222,42 @@ public class GrillaTurnos extends JFrame {
             }
         }
     }
+    private void exportarTurnosATxt() {
+        try {
+        String fechaStr = txtFecha.getText().trim().replace("/", "-");
+        String nombreArchivo = "Turnos_" + fechaStr + ".txt";
 
+        try (PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo))) {
+            pw.println("=== REPORTE DE TURNOS - CENTRO DE IMÁGENES ===");
+            pw.println("Fecha: " + txtFecha.getText().trim());
+            pw.println("--------------------------------------------------");
+            pw.println(String.format("%-8s | %-20s | %-20s | %-15s | %-10s", 
+                    "Hora", "Paciente", "Práctica", "Derivante", "Estado"));
+            pw.println("--------------------------------------------------");
+
+            for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+                String hora = (String) modeloTabla.getValueAt(i, 1);
+                String paciente = (String) modeloTabla.getValueAt(i, 2);
+                String practica = (String) modeloTabla.getValueAt(i, 3);
+                String derivante = (String) modeloTabla.getValueAt(i, 4);
+                String estado = (String) modeloTabla.getValueAt(i, 5);
+
+                pw.println(String.format("%-8s | %-20s | %-20s | %-15s | %-10s", 
+                        hora, paciente, practica, derivante, estado));
+            }
+
+            pw.println("--------------------------------------------------");
+            pw.println("Generado exitosamente por el sistema.");
+        }
+
+        JOptionPane.showMessageDialog(this, 
+                "¡Turnos exportados con éxito!\nArchivo guardado como: " + nombreArchivo, 
+                "Exportación Exitosa", JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, 
+                "Error al exportar el archivo: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }
 }

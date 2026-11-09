@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PracticaDAO {
+
     public List<Practica> listar() throws SQLException {
         List<Practica> lista = new ArrayList<>();
         String sql = "SELECT * FROM Practica ORDER BY nombre";
@@ -62,5 +63,37 @@ public class PracticaDAO {
             }
         }
         return null;
+    }
+
+    public boolean registrar(Practica p) throws SQLException {
+        String sql = "INSERT INTO Practica (codigoNomenclador, nombre) VALUES (?, ?)";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, p.getCodigoNomenclador());
+            ps.setString(2, p.getNombre());
+            int filas = ps.executeUpdate();
+            return filas > 0;
+        }
+    }
+
+    public boolean modificar(Practica p) throws SQLException {
+        String sql = "UPDATE Practica SET nombre = ? WHERE codigoNomenclador = ?";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, p.getNombre());
+            ps.setString(2, p.getCodigoNomenclador());
+            int filas = ps.executeUpdate();
+            return filas > 0;
+        }
+    }
+
+    public boolean eliminar(String codigo) throws SQLException {
+        String sql = "DELETE FROM Practica WHERE codigoNomenclador = ?";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, codigo);
+            int filas = ps.executeUpdate();
+            return filas > 0;
+        }
     }
 }

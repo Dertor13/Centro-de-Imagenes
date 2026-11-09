@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MedicoSolicitanteDAO {
+
     public List<MedicoSolicitante> listar() throws SQLException {
         List<MedicoSolicitante> lista = new ArrayList<>();
         String sql = "SELECT idMedicoSolicitante, nombre, apellido, matricula, especialidad FROM MedicoSolicitante ORDER BY apellido";
@@ -62,5 +63,41 @@ public class MedicoSolicitanteDAO {
             }
         }
         return null;
+    }
+
+    public boolean registrar(MedicoSolicitante med) throws SQLException {
+        String sql = "INSERT INTO MedicoSolicitante (nombre, apellido, matricula, especialidad) VALUES (?, ?, ?, ?)";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, med.getNombre());
+            ps.setString(2, med.getApellido());
+            ps.setString(3, med.getMatricula());
+            ps.setString(4, med.getEspecialidad());
+            int filas = ps.executeUpdate();
+            return filas > 0;
+        }
+    }
+
+    public boolean modificar(MedicoSolicitante med) throws SQLException {
+        String sql = "UPDATE MedicoSolicitante SET nombre = ?, apellido = ?, especialidad = ? WHERE matricula = ?";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, med.getNombre());
+            ps.setString(2, med.getApellido());
+            ps.setString(3, med.getEspecialidad());
+            ps.setString(4, med.getMatricula());
+            int filas = ps.executeUpdate();
+            return filas > 0;
+        }
+    }
+
+    public boolean eliminar(String matricula) throws SQLException {
+        String sql = "DELETE FROM MedicoSolicitante WHERE matricula = ?";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, matricula);
+            int filas = ps.executeUpdate();
+            return filas > 0;
+        }
     }
 }

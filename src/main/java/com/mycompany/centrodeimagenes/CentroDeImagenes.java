@@ -1,6 +1,6 @@
 package com.mycompany.centrodeimagenes;
 
-import Interfaz.MenuPrincipal; // Coincide con el nombre del archivo en la imagen
+import Interfaz.MenuPrincipal; 
 import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.SwingUtilities;
 
